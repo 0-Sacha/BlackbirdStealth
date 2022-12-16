@@ -1,0 +1,6 @@
+[submodule "EngineCore"]
+	path = EngineCore
+	url = git@github-perso:0-Sacha/EngineCore.git
+[submodule "Blackbird"]
+	path = Blackbird
+	url = git@github-perso:0-Sacha/Blackbird.git
