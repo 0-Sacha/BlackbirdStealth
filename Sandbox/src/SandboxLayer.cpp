@@ -16,62 +16,79 @@ void SandboxLayer::OnAttach()
 {
 	Blackbird::OpenGL::EnableOpenGlDebugging();
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_TriangleVertexArray.reset(Blackbird::VertexArray::Create());
 
-	m_Shader = Blackbird::Shader::FromGLSLTextFiles(
-		"assets/shaders/test.vert.glsl",
-		"assets/shaders/test.frag.glsl"
-	);
-
-	glCreateVertexArrays(1, &m_QuadVA);
-	glBindVertexArray(m_QuadVA);
-
-	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.5f,  0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f
+	float triangleVertices[] = {
+		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 0.2f, 0.8f, 0.8f, 1.0f,
+		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 	};
 
-	glCreateBuffers(1, &m_QuadVB);
-	glBindBuffer(GL_ARRAY_BUFFER, m_QuadVB);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	std::shared_ptr<Blackbird::VertexBuffer> triangleVertexBuffer;
+	triangleVertexBuffer.reset(Blackbird::VertexBuffer::Create(triangleVertices, sizeof(triangleVertices)));
+	Blackbird::BufferLayout triangleLayout = {
+		{ Blackbird::ShaderData::Type::Float3, "a_Position" },
+		{ Blackbird::ShaderData::Type::Float4, "a_Color" }
+	};
+	triangleVertexBuffer->SetLayout(triangleLayout);
+	m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	uint32_t triangleIndices[] = { 0, 1, 2 };
+	std::shared_ptr<Blackbird::IndexBuffer> triangleIndexBuffer;
+	triangleIndexBuffer.reset(Blackbird::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t)));
+	m_TriangleVertexArray->SetIndexBuffer(triangleIndexBuffer);
+	
+	m_TriangleShader = Blackbird::ShaderLoader::FromGLSLTextFiles(
+		"assets/shaders/triangle.vert.glsl",
+		"assets/shaders/triangle.frag.glsl"
+	);
+	
+	
+	m_SquareVertexArray.reset(Blackbird::VertexArray::Create());
 
-	uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
-	glCreateBuffers(1, &m_QuadIB);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadIB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	float squareVertices[] = {
+		-0.75f, -0.75f, 0.0f,
+		 0.75f, -0.75f, 0.0f,
+		 0.75f,  0.75f, 0.0f,
+		-0.75f,  0.75f, 0.0f,
+	};
+
+	std::shared_ptr<Blackbird::VertexBuffer> squareVertexBuffer;
+	squareVertexBuffer.reset(Blackbird::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+	Blackbird::BufferLayout squareLayout = {
+		{ Blackbird::ShaderData::Type::Float3, "a_Position" }
+	};
+	squareVertexBuffer->SetLayout(squareLayout);
+	m_SquareVertexArray->AddVertexBuffer(squareVertexBuffer);
+
+	uint32_t squareIndices[] = { 0, 1, 2, 2, 3, 0 };
+	std::shared_ptr<Blackbird::IndexBuffer> squareIndexBuffer;
+	squareIndexBuffer.reset(Blackbird::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+	m_SquareVertexArray->SetIndexBuffer(squareIndexBuffer);
+
+	m_SquareShader = Blackbird::ShaderLoader::FromGLSLTextFiles(
+		"assets/shaders/square.vert.glsl",
+		"assets/shaders/square.frag.glsl"
+	);
 }
 
 void SandboxLayer::OnDetach()
 {
-	glDeleteVertexArrays(1, &m_QuadVA);
-	glDeleteBuffers(1, &m_QuadVB);
-	glDeleteBuffers(1, &m_QuadIB);
 }
 
 void SandboxLayer::OnUpdate(Blackbird::TimeStep ts)
 {
+	Blackbird::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+	Blackbird::RendererCommand::Clear();
+
 	m_CameraController.OnUpdate(ts);
 
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Blackbird::Renderer::BeginScene(m_CameraController.GetCamera());
 
-	glUseProgram(m_Shader->GetRendererID());
+	Blackbird::Renderer::Submit(m_SquareShader, m_SquareVertexArray);
+	Blackbird::Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
 
-	int location = glGetUniformLocation(m_Shader->GetRendererID(), "u_ViewProjection");
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(m_CameraController.GetCamera().GetViewProjectionMatrix()));
-
-	location = glGetUniformLocation(m_Shader->GetRendererID(), "u_Color");
-	glUniform4fv(location, 1, glm::value_ptr(m_SquareColor));
-
-	glBindVertexArray(m_QuadVA);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	Blackbird::Renderer::EndScene();
 }
 
 void SandboxLayer::OnImGuiRender()
