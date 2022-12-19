@@ -1,18 +1,20 @@
 
-#include "SandboxLayer.h"
+#include "BlackbirdStealthLayer.h"
 
-SandboxLayer::SandboxLayer()
+#include "glm/gtc/matrix_transform.hpp"
+
+BlackbirdStealthLayer::BlackbirdStealthLayer()
 	: m_CameraController(16.0f / 9.0f, false)
 {
 
 }
 
-SandboxLayer::~SandboxLayer()
+BlackbirdStealthLayer::~BlackbirdStealthLayer()
 {
 
 }
 
-void SandboxLayer::OnAttach()
+void BlackbirdStealthLayer::OnAttach()
 {
 	Blackbird::OpenGL::EnableOpenGlDebugging();
 
@@ -47,10 +49,10 @@ void SandboxLayer::OnAttach()
 	m_SquareVertexArray.reset(Blackbird::VertexArray::Create());
 
 	float squareVertices[] = {
-		-0.75f, -0.75f, 0.0f,
-		 0.75f, -0.75f, 0.0f,
-		 0.75f,  0.75f, 0.0f,
-		-0.75f,  0.75f, 0.0f,
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.5f,  0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
 	};
 
 	std::shared_ptr<Blackbird::VertexBuffer> squareVertexBuffer;
@@ -72,26 +74,48 @@ void SandboxLayer::OnAttach()
 	);
 }
 
-void SandboxLayer::OnDetach()
+void BlackbirdStealthLayer::OnDetach()
 {
 }
 
-void SandboxLayer::OnUpdate(Blackbird::TimeStep ts)
+void BlackbirdStealthLayer::OnUpdate(Blackbird::TimeStep ts)
 {
 	Blackbird::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	Blackbird::RendererCommand::Clear();
 
 	m_CameraController.OnUpdate(ts);
 
+	if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::J))
+		m_SquarePosition.x -= m_SquareMoveSpeed * ts;
+	else if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::L))
+		m_SquarePosition.x += m_SquareMoveSpeed * ts;
+	
+	if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::I))
+		m_SquarePosition.y += m_SquareMoveSpeed * ts;
+	else if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::K))
+		m_SquarePosition.y -= m_SquareMoveSpeed * ts;
+
 	Blackbird::Renderer::BeginScene(m_CameraController.GetCamera());
 
-	Blackbird::Renderer::Submit(m_SquareShader, m_SquareVertexArray);
-	Blackbird::Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_SquarePosition);
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+	
+	for (auto i = 0; i < 5; i++)
+	{
+		for (auto j = 0; j < 5; j++)
+		{
+			glm::vec3 pos(i * 0.11f, j * 0.11f, 0.0f);
+			glm::mat4 subTransform = glm::translate(transform, pos) * scale;
+			Blackbird::Renderer::Submit(m_SquareShader, m_SquareVertexArray, subTransform);
+		}
+	}
+	
+	// Blackbird::Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
 
 	Blackbird::Renderer::EndScene();
 }
 
-void SandboxLayer::OnImGuiRender()
+void BlackbirdStealthLayer::OnImGuiRender()
 {
 	ImGui::Begin("Controls");
 	if (ImGui::ColorEdit4("Square Base Color", glm::value_ptr(m_SquareBaseColor)))
@@ -100,7 +124,7 @@ void SandboxLayer::OnImGuiRender()
 	ImGui::End();
 }
 
-void SandboxLayer::OnEvent(Blackbird::Event& event)
+void BlackbirdStealthLayer::OnEvent(Blackbird::Event& event)
 {
 	m_CameraController.OnEvent(event);
 

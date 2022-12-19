@@ -1,7 +1,7 @@
 
 #include "Blackbird.h"
 
-#include "SandboxLayer.h"
+#include "BlackbirdStealthLayer.h"
 
 class Sandbox : public Blackbird::Application
 {
@@ -9,7 +9,7 @@ public:
 	Sandbox()
 		: Blackbird::Application("Sandbox")
 	{
-		PushLayer(new SandboxLayer());
+		PushLayer(new BlackbirdStealthLayer());
 	}
 };
 
