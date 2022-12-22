@@ -4,7 +4,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 BlackbirdStealthLayer::BlackbirdStealthLayer()
-	: m_CameraController(16.0f / 9.0f, false)
+	: m_CameraController(16.0f / 9.0f, true)
 {
 
 }
