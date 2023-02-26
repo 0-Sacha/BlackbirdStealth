@@ -1,1 +1,0 @@
-vendor/premake5 clean

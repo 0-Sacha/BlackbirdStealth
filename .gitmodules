@@ -4,3 +4,6 @@
 [submodule "Blackbird"]
 	path = Blackbird
 	url = git@github-perso:0-Sacha/Blackbird.git
+[submodule "PremakeUtilities"]
+	path = PremakeUtilities
+	url = git@github-perso:0-Sacha/PremakeUtilities.git

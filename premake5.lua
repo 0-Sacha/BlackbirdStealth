@@ -8,7 +8,7 @@ workspace "BlackbirdStealth"
 	flags "MultiProcessorCompile"
 
 
-include "Premake/PremakeUtilities/Utilities.lua"
+include "PremakeUtilities/Utilities.lua"
 
 -- Include directories relative to WKS
 Solution.Name  = "BlackbirdStealth"
