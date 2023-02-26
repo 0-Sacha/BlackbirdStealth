@@ -15,7 +15,9 @@ public:
 	}
 };
 
-Blackbird::Application* Blackbird::CreateApplication()
+int main(int argc, char** argv)
 {
-	return new BlackbirdStealth();
+	auto app = new BlackbirdStealth();
+	app->Run();
+	delete app;
 }
