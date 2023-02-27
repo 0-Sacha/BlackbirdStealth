@@ -1,7 +1,7 @@
 
 #include "BlackbirdStealthLayer.h"
 
-#include "Platform/OpenGL/Engine/OpenGLShader/OpenGLShader.h"
+#include "Platform/GraphicsPlatform/OpenGL/Engine/OpenGLShader/OpenGLShader.h"
 
 BlackbirdStealthLayer::BlackbirdStealthLayer()
 	: m_CameraController(16.0f / 9.0f, true)
@@ -16,7 +16,7 @@ BlackbirdStealthLayer::~BlackbirdStealthLayer()
 
 void BlackbirdStealthLayer::OnAttach()
 {
-	Blackbird::Platform::OpenGL::EnableOpenGlDebugging();
+	Blackbird::GraphicsPlatform::OpenGL::EnableOpenGlDebugging();
 
 	m_TriangleVertexArray = Blackbird::AssetFactory::CreateVertexArray();
 
@@ -68,7 +68,7 @@ void BlackbirdStealthLayer::OnAttach()
 	m_BlendTexture = Blackbird::TextureFactory::CreateTexture2D("assets/texture/RGBA_comp.png");
 
 	m_ShaderLibrary.Get("TexSquareShader")->Bind();
-	std::dynamic_pointer_cast<Blackbird::Platform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("TexSquareShader"))->UploadUniformInt("u_Texture", 0);
+	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("TexSquareShader"))->UploadUniformInt("u_Texture", 0);
 }
 
 void BlackbirdStealthLayer::OnDetach()
@@ -98,7 +98,7 @@ void BlackbirdStealthLayer::OnUpdate(Blackbird::TimeStep ts)
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 	
 	m_ShaderLibrary.Get("SquareShader")->Bind();
-	std::dynamic_pointer_cast<Blackbird::Platform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("SquareShader"))->UploadUniformFloat4("u_Color", m_SquareColor);
+	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("SquareShader"))->UploadUniformFloat4("u_Color", m_SquareColor);
 
 	for (auto i = 0; i < 5; i++)
 	{

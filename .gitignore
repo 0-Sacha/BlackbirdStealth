@@ -12,3 +12,6 @@
 # bin
 bin
 bin-int
+
+Makefile
+*.make
