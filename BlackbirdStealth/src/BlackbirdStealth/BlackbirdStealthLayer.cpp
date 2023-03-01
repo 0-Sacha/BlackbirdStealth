@@ -5,8 +5,8 @@
 
 BlackbirdStealthLayer::BlackbirdStealthLayer()
 	: m_CameraController(16.0f / 9.0f, true)
+	, m_ShaderLibrary(m_EngineContext.ShaderFactory())
 {
-
 }
 
 BlackbirdStealthLayer::~BlackbirdStealthLayer()
@@ -18,7 +18,7 @@ void BlackbirdStealthLayer::OnAttach()
 {
 	Blackbird::GraphicsPlatform::OpenGL::EnableOpenGlDebugging();
 
-	m_TriangleVertexArray = Blackbird::AssetFactory::CreateVertexArray();
+	m_TriangleVertexArray = Blackbird::S_AssetFactory::CreateVertexArray();
 
 	float triangleVertices[] = {
 		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
@@ -26,7 +26,7 @@ void BlackbirdStealthLayer::OnAttach()
 		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 	};
 
-	std::shared_ptr<Blackbird::VertexBuffer> triangleVertexBuffer = Blackbird::AssetFactory::CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
+	std::shared_ptr<Blackbird::VertexBuffer> triangleVertexBuffer = Blackbird::S_AssetFactory::CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
 	Blackbird::BufferLayout triangleLayout = {
 		{ Blackbird::ShaderData::Type::Float3, "a_Position" },
 		{ Blackbird::ShaderData::Type::Float4, "a_Color" }
@@ -35,12 +35,12 @@ void BlackbirdStealthLayer::OnAttach()
 	m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
 
 	uint32_t triangleIndices[] = { 0, 1, 2 };
-	std::shared_ptr<Blackbird::IndexBuffer> triangleIndexBuffer = Blackbird::AssetFactory::CreateIndexBuffer(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
+	std::shared_ptr<Blackbird::IndexBuffer> triangleIndexBuffer = Blackbird::S_AssetFactory::CreateIndexBuffer(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
 	m_TriangleVertexArray->SetIndexBuffer(triangleIndexBuffer);
 	
 	m_ShaderLibrary.LoadFromPath("assets/shaders/TriangleShader.glsl");
 	
-	m_SquareVertexArray = Blackbird::AssetFactory::CreateVertexArray();
+	m_SquareVertexArray = Blackbird::S_AssetFactory::CreateVertexArray();
 
 	float squareVertices[] = {
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -49,7 +49,7 @@ void BlackbirdStealthLayer::OnAttach()
 		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 	};
 
-	std::shared_ptr<Blackbird::VertexBuffer> squareVertexBuffer = Blackbird::AssetFactory::CreateVertexBuffer(squareVertices, sizeof(squareVertices));
+	std::shared_ptr<Blackbird::VertexBuffer> squareVertexBuffer = Blackbird::S_AssetFactory::CreateVertexBuffer(squareVertices, sizeof(squareVertices));
 	Blackbird::BufferLayout squareLayout = {
 		{ Blackbird::ShaderData::Type::Float3, "a_Position" },
 		{ Blackbird::ShaderData::Type::Float2, "a_TexCoord" }
@@ -58,14 +58,14 @@ void BlackbirdStealthLayer::OnAttach()
 	m_SquareVertexArray->AddVertexBuffer(squareVertexBuffer);
 
 	uint32_t squareIndices[] = { 0, 1, 2, 2, 3, 0 };
-	std::shared_ptr<Blackbird::IndexBuffer> squareIndexBuffer = Blackbird::AssetFactory::CreateIndexBuffer(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
+	std::shared_ptr<Blackbird::IndexBuffer> squareIndexBuffer = Blackbird::S_AssetFactory::CreateIndexBuffer(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 	m_SquareVertexArray->SetIndexBuffer(squareIndexBuffer);
 
 	m_ShaderLibrary.LoadFromPath("assets/shaders/SquareShader.glsl");
 	m_ShaderLibrary.LoadFromPath("assets/shaders/TexSquareShader.glsl");
 
-	m_Texture = Blackbird::TextureFactory::CreateTexture2D("assets/texture/TestTexture.png");
-	m_BlendTexture = Blackbird::TextureFactory::CreateTexture2D("assets/texture/RGBA_comp.png");
+	m_Texture = Blackbird::S_TextureFactory::CreateTexture2D("assets/texture/TestTexture.png");
+	m_BlendTexture = Blackbird::S_TextureFactory::CreateTexture2D("assets/texture/RGBA_comp.png");
 
 	m_ShaderLibrary.Get("TexSquareShader")->Bind();
 	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("TexSquareShader"))->UploadUniformInt("u_Texture", 0);
@@ -77,22 +77,22 @@ void BlackbirdStealthLayer::OnDetach()
 
 void BlackbirdStealthLayer::OnUpdate(Blackbird::TimeStep ts)
 {
-	Blackbird::RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-	Blackbird::RendererCommand::Clear();
+	Blackbird::S_RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+	Blackbird::S_RendererCommand::Clear();
 
 	m_CameraController.OnUpdate(ts);
 
-	if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::J))
+	if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::J))
 		m_SquarePosition.x -= m_SquareMoveSpeed * ts;
-	else if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::L))
+	else if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::L))
 		m_SquarePosition.x += m_SquareMoveSpeed * ts;
 	
-	if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::I))
+	if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::I))
 		m_SquarePosition.y += m_SquareMoveSpeed * ts;
-	else if (Blackbird::Input::IsKeyPressed(Blackbird::KeyboardKey::K))
+	else if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::K))
 		m_SquarePosition.y -= m_SquareMoveSpeed * ts;
 
-	Blackbird::Renderer::BeginScene(m_CameraController.GetCamera());
+	Blackbird::S_Renderer::BeginScene(m_CameraController.GetCamera());
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_SquarePosition);
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
@@ -106,20 +106,20 @@ void BlackbirdStealthLayer::OnUpdate(Blackbird::TimeStep ts)
 		{
 			glm::vec3 pos(i * 0.11f, j * 0.11f, 0.0f);
 			glm::mat4 subTransform = glm::translate(transform, pos) * scale;
-			Blackbird::Renderer::Submit(m_ShaderLibrary.Get("SquareShader"), m_SquareVertexArray, subTransform);
+			Blackbird::S_Renderer::Submit(m_ShaderLibrary.Get("SquareShader"), m_SquareVertexArray, subTransform);
 		}
 	}
 
 	glm::mat4 bigSquareTransform = glm::scale(glm::mat4(1.0f), glm::vec3{ 0.3f, 0.3f, 0.3f });
 	m_Texture->Bind();
-	Blackbird::Renderer::Submit(m_ShaderLibrary.Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
+	Blackbird::S_Renderer::Submit(m_ShaderLibrary.Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
 
 	m_BlendTexture->Bind();
-	Blackbird::Renderer::Submit(m_ShaderLibrary.Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
+	Blackbird::S_Renderer::Submit(m_ShaderLibrary.Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
 
-	// Blackbird::Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
+	// Blackbird::S_Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
 
-	Blackbird::Renderer::EndScene();
+	Blackbird::S_Renderer::EndScene();
 }
 
 void BlackbirdStealthLayer::OnImGuiRender()
