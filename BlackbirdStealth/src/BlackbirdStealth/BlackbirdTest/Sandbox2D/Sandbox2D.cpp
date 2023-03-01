@@ -38,16 +38,15 @@ namespace BlackbirdTest
 		Blackbird::S_Renderer2D::CreateQuadDesigner()
 			.SetPosition(glm::vec2{ 2.0f, 2.0f })
 			.SetSize(glm::vec2{ 0.5f, 0.5f })
-			.SetRotation(glm::radians(45.0f))
+			//.SetRotation(glm::radians(45.0f))
 			.SetColor(m_SquareColor)
 			.DefaultDraw();
 
 		Blackbird::S_Renderer2D::CreateQuadDesigner()
 			.SetPosition(glm::vec3{ 0.0f, 0.0f, -0.1f })
 			.SetSize(glm::vec2{ 10.f, 10.f })
-			.SetRotation(glm::radians(20.0f))
-			.SetTexture(m_Texture)
-			.DefaultDraw();
+			// .SetRotation(glm::radians(20.0f))
+			.SetTexture(m_Texture);
 
 		Blackbird::S_Renderer2D::EndScene();
 	}
