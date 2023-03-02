@@ -64,8 +64,8 @@ void BlackbirdStealthLayer::OnAttach()
 	m_ShaderLibrary.LoadFromPath("assets/shaders/SquareShader.glsl");
 	m_ShaderLibrary.LoadFromPath("assets/shaders/TexSquareShader.glsl");
 
-	m_Texture = Blackbird::S_TextureFactory::CreateTexture2D("assets/texture/TestTexture.png");
-	m_BlendTexture = Blackbird::S_TextureFactory::CreateTexture2D("assets/texture/RGBA_comp.png");
+	m_Texture = Blackbird::S_TextureFactory::CreateTexture2DFromPath("assets/texture/TestTexture.png");
+	m_BlendTexture = Blackbird::S_TextureFactory::CreateTexture2DFromPath("assets/texture/RGBA_comp.png");
 
 	m_ShaderLibrary.Get("TexSquareShader")->Bind();
 	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary.Get("TexSquareShader"))->UploadUniformInt("u_Texture", 0);

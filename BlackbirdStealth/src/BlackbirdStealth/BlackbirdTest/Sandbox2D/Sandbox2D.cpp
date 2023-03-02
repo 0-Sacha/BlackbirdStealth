@@ -9,7 +9,7 @@ namespace BlackbirdTest
 	Sandbox2D::Sandbox2D()
 		: Blackbird::Layer("Sandbox2D"), m_CameraController(16.0f / 9.0f, true)
 	{
-		m_Texture = Blackbird::S_TextureFactory::CreateTexture2D("assets/texture/RGBA_comp.png");
+		m_Texture = Blackbird::S_TextureFactory::CreateTexture2DFromPath("assets/texture/RGBA_comp.png");
 	}
 
 	void Sandbox2D::OnAttach()
@@ -30,23 +30,32 @@ namespace BlackbirdTest
 
 		Blackbird::S_Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		Blackbird::S_Renderer2D::CreateQuadDesigner()
-			.SetPosition(glm::vec2{ 0.0f, 0.0f })
-			.SetColor(m_SquareColor)
-			.DefaultDraw();
+		Blackbird::S_Renderer2D::DrawQuadDesigner()
+			->SetPosition(glm::vec2{ 0.0f, 0.0f })
+			.SetColor(m_SquareColor);
 
-		Blackbird::S_Renderer2D::CreateQuadDesigner()
-			.SetPosition(glm::vec2{ 2.0f, 2.0f })
+		Blackbird::S_Renderer2D::DrawQuadDesigner()
+			->SetPosition(glm::vec2{ 2.0f, 2.0f })
 			.SetSize(glm::vec2{ 0.5f, 0.5f })
-			//.SetRotation(glm::radians(45.0f))
-			.SetColor(m_SquareColor)
-			.DefaultDraw();
+			.SetRotation(glm::radians(45.0f))
+			.SetColor(m_SquareColor);
 
-		Blackbird::S_Renderer2D::CreateQuadDesigner()
-			.SetPosition(glm::vec3{ 0.0f, 0.0f, -0.1f })
+		Blackbird::S_Renderer2D::DrawQuadDesigner()
+			->SetPosition(glm::vec3{ -5.0f, -5.0f, -0.1f })
 			.SetSize(glm::vec2{ 10.f, 10.f })
-			// .SetRotation(glm::radians(20.0f))
-			.SetTexture(m_Texture);
+			.SetRotation(glm::radians(20.0f))
+			.SetTexture(m_Texture)
+			.SetTilingFactor(10.0f);
+
+		static float rotation = 0.0f;
+		rotation += ts * 0.5f;
+
+		Blackbird::S_Renderer2D::DrawQuadDesigner()
+			->SetPosition(glm::vec3{ 12.0f, 12.0f, -0.1f })
+			.SetSize(glm::vec2{ 10.f, 10.f })
+			.SetRotation(rotation)
+			.SetTexture(m_Texture)
+			.SetTilingFactor(20.0f);
 
 		Blackbird::S_Renderer2D::EndScene();
 	}
