@@ -5,10 +5,10 @@
 namespace Blackbird
 {
 
-	class BlackbirdStealthLayer : public Layer
+	class BlackbirdSandboxLayer : public Layer
 	{
 	public:
-		BlackbirdStealthLayer();
+		BlackbirdSandboxLayer();
 
 	public:
 		void OnAttach() override;

@@ -1,146 +1,137 @@
-
 #include "BlackbirdStealthLayer.h"
 
-#include "Platform/GraphicsPlatform/OpenGL/Engine/OpenGLShader/OpenGLShader.h"
-
-BlackbirdStealthLayer::BlackbirdStealthLayer()
-	: m_CameraController(Blackbird::S_Input::Get(), 16.0f / 9.0f, true)
-	, m_ShaderLibrary()
+namespace Blackbird
 {
-}
-
-BlackbirdStealthLayer::~BlackbirdStealthLayer()
-{
-
-}
-
-void BlackbirdStealthLayer::OnAttach()
-{
-	Blackbird::GraphicsPlatform::OpenGL::EnableOpenGlDebugging();
-
-	m_TriangleVertexArray = Blackbird::S_AssetFactory::CreateVertexArray();
-
-	float triangleVertices[] = {
-		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-		 0.5f, -0.5f, 0.0f, 0.2f, 0.8f, 0.8f, 1.0f,
-		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-	};
-
-	std::shared_ptr<Blackbird::VertexBuffer> triangleVertexBuffer = Blackbird::S_AssetFactory::CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
-	Blackbird::BufferLayout triangleLayout = {
-		{ Blackbird::ShaderData::Type::Float3, "a_Position" },
-		{ Blackbird::ShaderData::Type::Float4, "a_Color" }
-	};
-	triangleVertexBuffer->SetLayout(triangleLayout);
-	m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
-
-	uint32_t triangleIndices[] = { 0, 1, 2 };
-	std::shared_ptr<Blackbird::IndexBuffer> triangleIndexBuffer = Blackbird::S_AssetFactory::CreateIndexBuffer(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
-	m_TriangleVertexArray->SetIndexBuffer(triangleIndexBuffer);
-	
-	m_SquareVertexArray = Blackbird::S_AssetFactory::CreateVertexArray();
-
-	float squareVertices[] = {
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-	};
-
-	std::shared_ptr<Blackbird::VertexBuffer> squareVertexBuffer = Blackbird::S_AssetFactory::CreateVertexBuffer(squareVertices, sizeof(squareVertices));
-	Blackbird::BufferLayout squareLayout = {
-		{ Blackbird::ShaderData::Type::Float3, "a_Position" },
-		{ Blackbird::ShaderData::Type::Float2, "a_TexCoord" }
-	};
-	squareVertexBuffer->SetLayout(squareLayout);
-	m_SquareVertexArray->AddVertexBuffer(squareVertexBuffer);
-
-	uint32_t squareIndices[] = { 0, 1, 2, 2, 3, 0 };
-	std::shared_ptr<Blackbird::IndexBuffer> squareIndexBuffer = Blackbird::S_AssetFactory::CreateIndexBuffer(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
-	m_SquareVertexArray->SetIndexBuffer(squareIndexBuffer);
-
-	m_ShaderLibrary->LoadFromPath("Assets/shaders/SquareShader.glsl");
-	m_ShaderLibrary->LoadFromPath("Assets/shaders/TexSquareShader.glsl");
-
-	m_Texture = Blackbird::S_TextureFactory::CreateTexture2DFromPath("Assets/texture/TestTexture.png");
-	m_BlendTexture = Blackbird::S_TextureFactory::CreateTexture2DFromPath("Assets/texture/RGBA_comp.png");
-
-	m_ShaderLibrary->Get("TexSquareShader")->Bind();
-	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary->Get("TexSquareShader"))->UploadUniformInt("u_Texture", 0);
-}
-
-void BlackbirdStealthLayer::OnDetach()
-{
-}
-
-void BlackbirdStealthLayer::OnUpdate(Blackbird::TimeStep ts)
-{
-	Blackbird::S_RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-	Blackbird::S_RendererCommand::Clear();
-
-	m_CameraController.OnUpdate(ts);
-
-	if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::J))
-		m_SquarePosition.x -= m_SquareMoveSpeed * ts;
-	else if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::L))
-		m_SquarePosition.x += m_SquareMoveSpeed * ts;
-	
-	if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::I))
-		m_SquarePosition.y += m_SquareMoveSpeed * ts;
-	else if (Blackbird::S_Input::IsKeyPressed(Blackbird::KeyboardKey::K))
-		m_SquarePosition.y -= m_SquareMoveSpeed * ts;
-
-	Blackbird::S_Renderer::BeginScene(m_CameraController.GetCamera());
-
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_SquarePosition);
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-	
-	m_ShaderLibrary->Get("SquareShader")->Bind();
-	std::dynamic_pointer_cast<Blackbird::GraphicsPlatform::OpenGL::OpenGLShader>(m_ShaderLibrary->Get("SquareShader"))->UploadUniformFloat4("u_Color", m_SquareColor);
-
-	for (auto i = 0; i < 5; i++)
+	BlackbirdStealthLayer::BlackbirdStealthLayer()
+		: Layer("BlackbirdStealthLayer")
+		, m_CameraController(S_Input::Get(), 16.0f / 9.0f, true)
 	{
-		for (auto j = 0; j < 5; j++)
-		{
-			glm::vec3 pos(i * 0.11f, j * 0.11f, 0.0f);
-			glm::mat4 subTransform = glm::translate(transform, pos) * scale;
-			Blackbird::S_Renderer::Submit(m_ShaderLibrary->Get("SquareShader"), m_SquareVertexArray, subTransform);
-		}
+		m_Texture = S_TextureFactory::CreateTexture2DFromPath("Assets/texture/RGBA_comp.png");
+		m_SpritesFactoryLibrary = S_TextureFactory::CreateSpritesFactoryLibraryFromPath("Assets/texture/RPGpack_sheet_2X.png", { 128, 128 });
+		m_SpritesFactoryLibrary->AddSprite("Stairs", { 7, 6 });
+		m_SpritesFactoryLibrary->AddSprite("Barrel", { 8, 2 });
+		m_SpritesFactoryLibrary->AddSprite("BigGreenTree", { 0, 1 }, { 1, 2 });
 	}
 
-	glm::mat4 bigSquareTransform = glm::scale(glm::mat4(1.0f), glm::vec3{ 0.3f, 0.3f, 0.3f });
-	m_Texture->Bind();
-	Blackbird::S_Renderer::Submit(m_ShaderLibrary->Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
+	void BlackbirdStealthLayer::OnAttach()
+	{
+	}
 
-	m_BlendTexture->Bind();
-	Blackbird::S_Renderer::Submit(m_ShaderLibrary->Get("TexSquareShader"), m_SquareVertexArray, bigSquareTransform);
+	void BlackbirdStealthLayer::OnDetach()
+	{
 
-	// Blackbird::S_Renderer::Submit(m_TriangleShader, m_TriangleVertexArray);
+	}
 
-	Blackbird::S_Renderer::EndScene();
-}
+	static int lastFPSCount = 0;
 
-void BlackbirdStealthLayer::OnImGuiRender()
-{
-	ImGui::Begin("Controls");
-	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
-	ImGui::End();
-}
+	void BlackbirdStealthLayer::OnUpdate(TimeStep ts)
+	{
+		S_Renderer2D::ResetStats();
+		lastFPSCount = ts.GetFPS();
 
-void BlackbirdStealthLayer::OnEvent(Blackbird::Event& event)
-{
-	m_CameraController.OnEvent(event);
-	Blackbird::EventDispatcher dispatcher(event);
+		m_CameraController.OnUpdate(ts);
 
-	dispatcher.Dispatch<Blackbird::MouseButtonPressedEvent>(
-		[&](Blackbird::MouseButtonPressedEvent& e)
+		S_RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		S_RendererCommand::Clear();
+
+		S_Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec2{ 0.0f, 0.0f })
+			.SetColor(m_SquareColor);
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec2{ 2.0f, 2.0f })
+			.SetSize(glm::vec2{ 0.5f, 0.5f })
+			.SetRotation(glm::radians(45.0f))
+			.SetColor(m_SquareColor);
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec3{ -5.0f, -5.0f, -0.1f })
+			.SetSize(glm::vec2{ 10.f, 10.f })
+			.SetRotation(glm::radians(20.0f))
+			.SetTexture(m_Texture)
+			.SetTilingFactor(10.0f);
+
+		static float rotation = 0.0f;
+		rotation += ts * 0.5f;
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec3{ 12.0f, 12.0f, -0.1f })
+			.SetSize(glm::vec2{ 10.f, 10.f })
+			.SetRotation(rotation)
+			.SetTexture(m_Texture)
+			.SetTilingFactor(20.0f);
+
+		S_Renderer2D::EndScene();
+
+
+
+		S_Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		for (float y = -50.0f; y < 50.0f; y += 0.5f)
+			for (float x = -50.0f; x < 50.0f; x += 0.5f)
+			{
+				glm::vec4 color = { (x + 50.0f) / 100.0f, 0.3f, (y + 50.0f) / 100.0f, 0.4f };
+				S_Renderer2D::DrawQuad()
+					->SetPosition({ x, y })
+					.SetSize({ 0.45f, 0.45f })
+					.SetColor(color);
+			}
+
+		S_Renderer2D::EndScene();
+
+
+
+		S_Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec3{ 1.0f, 0.0f, 0.5f })
+			.SetTexture(m_SpritesFactoryLibrary->Get("Stairs"));
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec3{ 4.0f, 0.0f, 0.5f })
+			.SetTexture(m_SpritesFactoryLibrary->Get("Barrel"));
+
+		S_Renderer2D::DrawQuad()
+			->SetPosition(glm::vec3{ 1.0f, 3.0f, 0.5f })
+			.SetSize({ 1.0f, 2.0f })
+			.SetTexture(m_SpritesFactoryLibrary->Get("BigGreenTree"));
+
+		S_Renderer2D::EndScene();
+	}
+
+	void BlackbirdStealthLayer::OnImGuiRender()
+	{
+		if (ImGui::BeginMenuBar())
 		{
-			return false;
-		});
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Exit")) { S_Application::Close(); }
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
 
-	dispatcher.Dispatch<Blackbird::MouseButtonReleasedEvent>(
-		[&](Blackbird::MouseButtonReleasedEvent& e)
-		{
-			return false;
-		});
+		ImGui::Begin("Setting");
+		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_SquareColor));
+		ImGui::End();
+	
+		auto stats = S_Renderer2D::GetStats();
+		ImGui::Begin("Renderer Statistics");
+		ImGui::Text("FPS: %d", lastFPSCount);
+		ImGui::Text("DrawCall: %d", stats.DrawCall);
+		ImGui::BeginChild("QuadDesigner");
+		ImGui::Text("QuadCount: %d", stats.QuadStats.QuadCount);
+		ImGui::Text("VerticiesCount: %d", stats.QuadStats.GetVerticiesCount());
+		ImGui::Text("IndiciesCount: %d", stats.QuadStats.GetIndiciesCount());
+		ImGui::EndChild();
+		ImGui::End();
+	}
+
+	void BlackbirdStealthLayer::OnEvent(Event& event)
+	{
+		m_CameraController.OnEvent(event);
+	}
+
 }
