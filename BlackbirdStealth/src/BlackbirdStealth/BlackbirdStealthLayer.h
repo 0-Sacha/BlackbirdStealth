@@ -18,7 +18,7 @@ public:
 private:
 	Blackbird::OrthographicCameraController m_CameraController;
 
-	Blackbird::ShaderLibrary m_ShaderLibrary;
+	Blackbird::Ref<Blackbird::ShaderPathsLibrary> m_ShaderLibrary;
 
 	Blackbird::Ref<Blackbird::VertexArray> m_TriangleVertexArray;
 	Blackbird::Ref<Blackbird::VertexArray> m_SquareVertexArray;
