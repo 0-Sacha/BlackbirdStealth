@@ -21,6 +21,8 @@ namespace Blackbird
 		OrthographicCameraController m_CameraController;
 		Ref<SpritesFactoryLibrary> m_SpritesFactoryLibrary;
 		Ref<Texture2D> m_Texture;
+		Ref<Framebuffer> m_Framebuffer;
+
 		glm::vec4 m_SquareColor = { 0.8f, 0.2f, 0.3f, 1.0f };
 	};
 

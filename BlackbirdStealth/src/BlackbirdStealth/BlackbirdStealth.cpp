@@ -10,7 +10,7 @@ namespace Blackbird
 	{
 	public:
 		BlackbirdStealth()
-			: Blackbird::Application("Sandbox")
+			: Blackbird::Application("BlackbirdStealth")
 		{
 			PushLayer(std::make_shared<BlackbirdStealthLayer>());
 		}

@@ -1,11 +1,13 @@
-#include "BlackbirdSandboxLayer.h"
+#include "BlackbirdLauncherLayer.h"
 
 namespace Blackbird
 {
-	BlackbirdSandboxLayer::BlackbirdSandboxLayer()
-		: Layer("BlackbirdSandboxLayer")
-		, m_CameraController(S_Input::Get(), 16.0f / 9.0f, true)
+	BlackbirdLauncherLayer::BlackbirdLauncherLayer()
+		: Layer("BlackbirdLauncherLayer")
+		, m_CameraController(S_Input::Get(), 16.0f / 9.0f)
 	{
+		m_CameraController.EnableRotation();
+
 		m_Texture = S_TextureFactory::CreateTexture2DFromPath("Assets/texture/RGBA_comp.png");
 		m_SpritesFactoryLibrary = S_TextureFactory::CreateSpritesFactoryLibraryFromPath("Assets/texture/RPGpack_sheet_2X.png", { 128, 128 });
 		m_SpritesFactoryLibrary->AddSprite("Stairs", { 7, 6 });
@@ -13,18 +15,18 @@ namespace Blackbird
 		m_SpritesFactoryLibrary->AddSprite("BigGreenTree", { 0, 1 }, { 1, 2 });
 	}
 
-	void BlackbirdSandboxLayer::OnAttach()
+	void BlackbirdLauncherLayer::OnAttach()
 	{
 	}
 
-	void BlackbirdSandboxLayer::OnDetach()
+	void BlackbirdLauncherLayer::OnDetach()
 	{
 
 	}
 
 	static int lastFPSCount = 0;
 
-	void BlackbirdSandboxLayer::OnUpdate(TimeStep ts)
+	void BlackbirdLauncherLayer::OnUpdate(TimeStep ts)
 	{
 		S_Renderer2D::ResetStats();
 		lastFPSCount = ts.GetFPS();
@@ -101,7 +103,7 @@ namespace Blackbird
 		S_Renderer2D::EndScene();
 	}
 
-	void BlackbirdSandboxLayer::OnImGuiRender()
+	void BlackbirdLauncherLayer::OnImGuiRender()
 	{
 		ImGui::Begin("Setting");
 		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_SquareColor));
@@ -119,7 +121,7 @@ namespace Blackbird
 		ImGui::End();
 	}
 
-	void BlackbirdSandboxLayer::OnEvent(Event& event)
+	void BlackbirdLauncherLayer::OnEvent(Event& event)
 	{
 		m_CameraController.OnEvent(event);
 	}

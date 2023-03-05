@@ -1,5 +1,5 @@
 
-project "BlackbirdSandbox"
+project "BlackbirdLauncher"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
