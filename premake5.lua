@@ -12,12 +12,12 @@ include "PremakeUtilities/Utilities.lua"
 
 -- Include directories relative to WKS
 Solution.Name  = "BlackbirdStealth"
-Solution.Projects["EngineCore"] 		= "%{wks.location}/EngineCore/"
+Solution.Projects["ProjectCore"] 		= "%{wks.location}/ProjectCore/"
 Solution.Projects["Blackbird"] 			= "%{wks.location}/Blackbird/"
 Solution.Projects["BlackbirdStealth"] 	= "%{wks.location}/BlackbirdStealth/"
 Solution.Projects["BlackbirdLauncher"] 	= "%{wks.location}/BlackbirdLauncher/"
 
-include "EngineCore"
+include "ProjectCore"
 include "Blackbird"
 include "BlackbirdStealth"
 include "BlackbirdLauncher"

@@ -18,5 +18,5 @@ project "BlackbirdStealth"
 		"src/"
 	}
 
-	Solution.IncludeAndLinkProject("EngineCore")
+	Solution.IncludeAndLinkProject("ProjectCore")
 	Solution.IncludeAndLinkProject("Blackbird")

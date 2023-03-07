@@ -4,3 +4,6 @@
 [submodule "PremakeUtilities"]
 	path = PremakeUtilities
 	url = git@github-perso:0-Sacha/PremakeUtilities.git
+[submodule "ProjectCore"]
+	path = ProjectCore
+	url = git@github-perso:0-Sacha/ProjectCore
