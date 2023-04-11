@@ -1,14 +1,17 @@
 #include "BlackbirdStealthLayer.h"
 
+#include "Blackbird/EngineUtils/UtilsScripts/CameraControllerScript.h"
+
 namespace Blackbird
 {
 	BlackbirdStealthLayer::BlackbirdStealthLayer()
 		: Layer("BlackbirdStealthLayer")
-		, m_CameraController(S_Input::Get(), 16.0f / 9.0f)
+	{}
+	
+	
+	void BlackbirdStealthLayer::OnAttach()
 	{
 		S_Application::GetImGuiLayer().EnableDockspace();
-
-		m_CameraController.EnableRotation();
 
 		m_Texture = S_TextureFactory::CreateTexture2DFromPath("Assets/texture/RGBA_comp.png");
 		m_SpritesFactoryLibrary = S_TextureFactory::CreateSpritesFactoryLibraryFromPath("Assets/texture/RPGpack_sheet_2X.png", { 128, 128 });
@@ -20,10 +23,19 @@ namespace Blackbird
 		framebufferSpecification.Height = 180;
 		framebufferSpecification.Width = 320;
 		m_Framebuffer = S_FramebufferFactory::Create(framebufferSpecification);
-	}
 
-	void BlackbirdStealthLayer::OnAttach()
-	{
+		m_Scene = std::make_shared<Scene2D>(S_Renderer2D::GetRef());
+		m_Square = m_Scene->CreateEntity("Square");
+		m_Square.AddComponent<SpritRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+		m_CameraOne = m_Scene->CreateEntity("CameraOne");
+		m_CameraOne.AddComponent<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
+		m_CameraOne.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraOne, m_ApplicationLinked->GetEngineContext().Input());
+
+		m_CameraTwo = m_Scene->CreateEntity("CameraTwo");
+		m_CameraTwo.AddComponent<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
+		m_CameraTwo.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraTwo, m_ApplicationLinked->GetEngineContext().Input());
+		m_Scene->SetPrimatryCameraEntity(m_CameraOne);
 	}
 
 	void BlackbirdStealthLayer::OnDetach()
@@ -37,13 +49,17 @@ namespace Blackbird
 	{
 		S_Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
-
-		lastFPSCount = ts.GetFPS();
-
-		m_CameraController.OnUpdate(ts);
-
+		
 		S_RendererCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		S_RendererCommand::Clear();
+
+		m_Scene->OnUpdate(ts);
+
+		m_Framebuffer->Release();
+	}
+
+	/*
+		lastFPSCount = ts.GetFPS();
 
 		S_Renderer2D::BeginScene(m_CameraController.GetCamera());
 
@@ -110,9 +126,7 @@ namespace Blackbird
 			.SetTexture(m_SpritesFactoryLibrary->Get("BigGreenTree"));
 
 		S_Renderer2D::EndScene();
-
-		m_Framebuffer->Release();
-	}
+		*/
 
 	void BlackbirdStealthLayer::OnImGuiRender()
 	{
@@ -137,15 +151,14 @@ namespace Blackbird
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Image((void*)framebufferID, viewportSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		if (viewportSize.x > 0 && viewportSize.y > 0)
-			if (viewportSize.x != m_Framebuffer->GetWidth() || viewportSize.y != m_Framebuffer->GetHeight())
-			{
-				m_Framebuffer->Resize(viewportSize.x, viewportSize.y);
-				m_CameraController.SetAspectRatio(m_Framebuffer->GetWidth(), m_Framebuffer->GetHeight());
-			}
+		{
+			m_Scene->OnViewportResize(viewportSize.x, viewportSize.y);
+			m_Framebuffer->Resize(viewportSize.x, viewportSize.y);
+		}
 		ImGui::End();
 
 		ImGui::Begin("Setting");
-		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_SquareColor));
+		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_Square.GetComponent<SpritRendererComponent>().Color));
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -159,11 +172,39 @@ namespace Blackbird
 		ImGui::Text("IndiciesCount: %d", stats.QuadStats.GetIndiciesCount());
 		ImGui::EndChild();
 		ImGui::End();
+
+		ImGui::Begin("Camera");
+		if (ImGui::Button("Switch camera"))
+		{
+			if (m_Scene->GetPrimatryCameraEntity() == m_CameraOne)
+			{
+				m_CameraTwo.GetComponent<NativeScriptComponent>().Enable = true;
+				m_CameraOne.GetComponent<NativeScriptComponent>().Enable = false;
+				m_Scene->SetPrimatryCameraEntity(m_CameraTwo);
+			}
+			else
+			{
+				m_CameraOne.GetComponent<NativeScriptComponent>().Enable = true;
+				m_CameraTwo.GetComponent<NativeScriptComponent>().Enable = false;
+				m_Scene->SetPrimatryCameraEntity(m_CameraOne);
+			}
+		}
+
+		ImGui::DragFloat3("Tranform Camera One", glm::value_ptr(m_CameraOne.GetComponent<TransformComponent>().Transform[3]), 0.1f);
+		float orthoSizeCameraOne = m_CameraOne.GetComponent<SceneCameraComponent>().Camera.GetOrthographicSize();
+		if (ImGui::DragFloat("Orthographic Size Camera One", &orthoSizeCameraOne, 0.1f))
+			m_CameraOne.GetComponent<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraOne);
+
+		ImGui::DragFloat3("Tranform Camera Two", glm::value_ptr(m_CameraTwo.GetComponent<TransformComponent>().Transform[3]), 0.1f);
+		float orthoSizeCameraTwo = m_CameraTwo.GetComponent<SceneCameraComponent>().Camera.GetOrthographicSize();
+		if (ImGui::DragFloat("Orthographic Size Camera Two", &orthoSizeCameraTwo, 0.1f))
+			m_CameraTwo.GetComponent<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraTwo);
+
+		ImGui::End();
 	}
 
 	void BlackbirdStealthLayer::OnEvent(Event& event)
 	{
-		m_CameraController.OnEvent(event);
 	}
 
 }

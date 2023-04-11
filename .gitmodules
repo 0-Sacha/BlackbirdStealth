@@ -7,3 +7,6 @@
 [submodule "ProjectCore"]
 	path = ProjectCore
 	url = git@github-perso:0-Sacha/ProjectCore
+[submodule "LittleECS"]
+	path = LittleECS
+	url = git@github-perso:0-Sacha/LittleECS.git

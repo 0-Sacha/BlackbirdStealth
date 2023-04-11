@@ -18,12 +18,15 @@ namespace Blackbird
 		void OnEvent(Event& event) override;
 
 	private:
-		OrthographicCameraController m_CameraController;
+		Ref<Scene2D> m_Scene;
+
 		Ref<SpritesFactoryLibrary> m_SpritesFactoryLibrary;
 		Ref<Texture2D> m_Texture;
 		Ref<Framebuffer> m_Framebuffer;
 
-		glm::vec4 m_SquareColor = { 0.8f, 0.2f, 0.3f, 1.0f };
+		Entity m_Square;
+		Entity m_CameraOne;
+		Entity m_CameraTwo;
 	};
 
 }
