@@ -26,15 +26,15 @@ namespace Blackbird
 
 		m_Scene = std::make_shared<Scene2D>(S_Renderer2D::GetRef());
 		m_Square = m_Scene->CreateEntity("Square");
-		m_Square.AddComponent<SpritRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		m_Square.Add<SpritRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
 		m_CameraOne = m_Scene->CreateEntity("CameraOne");
-		m_CameraOne.AddComponent<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
-		m_CameraOne.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraOne, m_ApplicationLinked->GetEngineContext().Input());
+		m_CameraOne.Add<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
+		m_CameraOne.Add<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraOne, m_ApplicationLinked->GetEngineContext().Input());
 
 		m_CameraTwo = m_Scene->CreateEntity("CameraTwo");
-		m_CameraTwo.AddComponent<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
-		m_CameraTwo.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraTwo, m_ApplicationLinked->GetEngineContext().Input());
+		m_CameraTwo.Add<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
+		m_CameraTwo.Add<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraTwo, m_ApplicationLinked->GetEngineContext().Input());
 		m_Scene->SetPrimatryCameraEntity(m_CameraOne);
 	}
 
@@ -158,7 +158,7 @@ namespace Blackbird
 		ImGui::End();
 
 		ImGui::Begin("Setting");
-		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_Square.GetComponent<SpritRendererComponent>().Color));
+		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_Square.Get<SpritRendererComponent>().Color));
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -178,27 +178,27 @@ namespace Blackbird
 		{
 			if (m_Scene->GetPrimatryCameraEntity() == m_CameraOne)
 			{
-				m_CameraTwo.GetComponent<NativeScriptComponent>().Enable = true;
-				m_CameraOne.GetComponent<NativeScriptComponent>().Enable = false;
+				m_CameraTwo.Get<NativeScriptComponent>().Enable = true;
+				m_CameraOne.Get<NativeScriptComponent>().Enable = false;
 				m_Scene->SetPrimatryCameraEntity(m_CameraTwo);
 			}
 			else
 			{
-				m_CameraOne.GetComponent<NativeScriptComponent>().Enable = true;
-				m_CameraTwo.GetComponent<NativeScriptComponent>().Enable = false;
+				m_CameraOne.Get<NativeScriptComponent>().Enable = true;
+				m_CameraTwo.Get<NativeScriptComponent>().Enable = false;
 				m_Scene->SetPrimatryCameraEntity(m_CameraOne);
 			}
 		}
 
-		ImGui::DragFloat3("Tranform Camera One", glm::value_ptr(m_CameraOne.GetComponent<TransformComponent>().Transform[3]), 0.1f);
-		float orthoSizeCameraOne = m_CameraOne.GetComponent<SceneCameraComponent>().Camera.GetOrthographicSize();
+		ImGui::DragFloat3("Tranform Camera One", glm::value_ptr(m_CameraOne.Get<TransformComponent>().Transform[3]), 0.1f);
+		float orthoSizeCameraOne = m_CameraOne.Get<SceneCameraComponent>().Camera.GetOrthographicSize();
 		if (ImGui::DragFloat("Orthographic Size Camera One", &orthoSizeCameraOne, 0.1f))
-			m_CameraOne.GetComponent<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraOne);
+			m_CameraOne.Get<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraOne);
 
-		ImGui::DragFloat3("Tranform Camera Two", glm::value_ptr(m_CameraTwo.GetComponent<TransformComponent>().Transform[3]), 0.1f);
-		float orthoSizeCameraTwo = m_CameraTwo.GetComponent<SceneCameraComponent>().Camera.GetOrthographicSize();
+		ImGui::DragFloat3("Tranform Camera Two", glm::value_ptr(m_CameraTwo.Get<TransformComponent>().Transform[3]), 0.1f);
+		float orthoSizeCameraTwo = m_CameraTwo.Get<SceneCameraComponent>().Camera.GetOrthographicSize();
 		if (ImGui::DragFloat("Orthographic Size Camera Two", &orthoSizeCameraTwo, 0.1f))
-			m_CameraTwo.GetComponent<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraTwo);
+			m_CameraTwo.Get<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraTwo);
 
 		ImGui::End();
 	}

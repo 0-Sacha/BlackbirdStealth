@@ -19,4 +19,5 @@ project "BlackbirdStealth"
 	}
 
 	Solution.IncludeAndLinkProject("ProjectCore")
+	Solution.IncludeProject("LittleECS")
 	Solution.IncludeAndLinkProject("Blackbird")
