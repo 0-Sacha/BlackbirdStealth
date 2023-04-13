@@ -2,6 +2,7 @@
 
 #include "Blackbird/EngineUtils/UtilsScripts/CameraControllerScript.h"
 
+
 namespace Blackbird
 {
 	BlackbirdStealthLayer::BlackbirdStealthLayer()
@@ -36,6 +37,8 @@ namespace Blackbird
 		m_CameraTwo.Add<SceneCameraComponent>().ResizeAspectRatioOnViewport = true;
 		m_CameraTwo.Add<NativeScriptComponent>().Bind<CameraControllerScript>(m_CameraTwo, m_ApplicationLinked->GetEngineContext().Input());
 		m_Scene->SetPrimatryCameraEntity(m_CameraOne);
+
+		m_SceneHierarchyPanel.SetContext(m_Scene);
 	}
 
 	void BlackbirdStealthLayer::OnDetach()
@@ -149,7 +152,7 @@ namespace Blackbird
 
 		std::uint32_t framebufferID = m_Framebuffer->GetColorAttachementID();
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-		ImGui::Image((void*)framebufferID, viewportSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		ImGui::Image(reinterpret_cast<void*>(framebufferID), viewportSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		if (viewportSize.x > 0 && viewportSize.y > 0)
 		{
 			m_Scene->OnViewportResize(viewportSize.x, viewportSize.y);
@@ -201,6 +204,8 @@ namespace Blackbird
 			m_CameraTwo.Get<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraTwo);
 
 		ImGui::End();
+
+		m_SceneHierarchyPanel.OnImGuiRender();
 	}
 
 	void BlackbirdStealthLayer::OnEvent(Event& event)

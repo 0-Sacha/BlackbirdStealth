@@ -2,6 +2,8 @@
 
 #include "Blackbird.h"
 
+#include "SceneHierarchyPanel/SceneHierarchyPanel.h"
+
 namespace Blackbird
 {
 
@@ -27,6 +29,8 @@ namespace Blackbird
 		Entity m_Square;
 		Entity m_CameraOne;
 		Entity m_CameraTwo;
+
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 
 }
