@@ -3,6 +3,8 @@
 #include "Blackbird/ImGui/ImGuiLayer.h"
 #include "Blackbird/Scene/Components.h"
 
+#include "ImGui/misc/cpp/imgui_stdlib.h"
+
 namespace Blackbird
 {
 
@@ -27,6 +29,11 @@ namespace Blackbird
 			});
 		
 		ImGui::End();
+
+		ImGui::Begin("Properties");
+		if (m_SelectionContext.IsValid())
+			DrawComponents(m_SelectionContext);
+		ImGui::End();
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
@@ -47,6 +54,15 @@ namespace Blackbird
 			ImGui::TreePop();
 		}
 
+	}
+
+	void SceneHierarchyPanel::DrawComponents(Entity entity)
+	{
+		if (entity.Has<TagComponent>())
+		{
+			std::string& tag = entity.Get<TagComponent>().Tag;
+			ImGui::InputText("Tag", &tag);
+		}
 	}
 
 }

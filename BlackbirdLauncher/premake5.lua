@@ -1,4 +1,10 @@
 
+Solution.ProjectsInfo.ProjectDependencies["BlackbirdLauncher"] = {
+	"ProjectCore",
+	"LittleECS",
+	"Blackbird"
+}
+
 project "BlackbirdLauncher"
 	kind "ConsoleApp"
 	language "C++"
@@ -18,6 +24,5 @@ project "BlackbirdLauncher"
 		"src/"
 	}
 
-	Solution.IncludeAndLinkProject("ProjectCore")
-	Solution.IncludeProject("LittleECS")
-	Solution.IncludeAndLinkProject("Blackbird")
+	Solution.Project("BlackbirdLauncher")
+	
