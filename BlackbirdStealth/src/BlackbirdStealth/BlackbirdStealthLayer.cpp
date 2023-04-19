@@ -159,10 +159,6 @@ namespace Blackbird
 			m_Framebuffer->Resize(viewportSize.x, viewportSize.y);
 		}
 		ImGui::End();
-
-		ImGui::Begin("Setting");
-		ImGui::ColorEdit3("SquareColor", glm::value_ptr(m_Square.Get<SpritRendererComponent>().Color));
-		ImGui::End();
 		ImGui::PopStyleVar();
 
 		auto stats = S_Renderer2D::GetStats();
@@ -174,35 +170,6 @@ namespace Blackbird
 		ImGui::Text("VerticiesCount: %d", stats.QuadStats.GetVerticiesCount());
 		ImGui::Text("IndiciesCount: %d", stats.QuadStats.GetIndiciesCount());
 		ImGui::EndChild();
-		ImGui::End();
-
-		ImGui::Begin("Camera");
-		if (ImGui::Button("Switch camera"))
-		{
-			if (m_Scene->GetPrimatryCameraEntity() == m_CameraOne)
-			{
-				m_CameraTwo.Get<NativeScriptComponent>().Enable = true;
-				m_CameraOne.Get<NativeScriptComponent>().Enable = false;
-				m_Scene->SetPrimatryCameraEntity(m_CameraTwo);
-			}
-			else
-			{
-				m_CameraOne.Get<NativeScriptComponent>().Enable = true;
-				m_CameraTwo.Get<NativeScriptComponent>().Enable = false;
-				m_Scene->SetPrimatryCameraEntity(m_CameraOne);
-			}
-		}
-
-		ImGui::DragFloat3("Tranform Camera One", glm::value_ptr(m_CameraOne.Get<TransformComponent>().Transform[3]), 0.1f);
-		float orthoSizeCameraOne = m_CameraOne.Get<SceneCameraComponent>().Camera.GetOrthographicSize();
-		if (ImGui::DragFloat("Orthographic Size Camera One", &orthoSizeCameraOne, 0.1f))
-			m_CameraOne.Get<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraOne);
-
-		ImGui::DragFloat3("Tranform Camera Two", glm::value_ptr(m_CameraTwo.Get<TransformComponent>().Transform[3]), 0.1f);
-		float orthoSizeCameraTwo = m_CameraTwo.Get<SceneCameraComponent>().Camera.GetOrthographicSize();
-		if (ImGui::DragFloat("Orthographic Size Camera Two", &orthoSizeCameraTwo, 0.1f))
-			m_CameraTwo.Get<SceneCameraComponent>().Camera.SetOrthographicSize(orthoSizeCameraTwo);
-
 		ImGui::End();
 
 		m_SceneHierarchyPanel.OnImGuiRender();

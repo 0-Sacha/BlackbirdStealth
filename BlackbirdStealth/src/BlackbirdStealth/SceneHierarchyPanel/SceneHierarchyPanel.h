@@ -20,6 +20,9 @@ namespace Blackbird
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
 
+		template <typename T, typename Function>
+		void DrawComponent(Entity entity, const char* label, Function function);
+
 	private:
 		Ref<Scene2D> m_Context{ nullptr };
 		Entity m_SelectionContext;
