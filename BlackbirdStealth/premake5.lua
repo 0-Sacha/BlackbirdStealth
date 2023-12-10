@@ -1,12 +1,12 @@
 
-Solution.ProjectsInfo.ProjectDependencies["BlackbirdStealth"] = {
+Solution.Projects["BlackbirdStealth"].ProjectDependencies = {
 	"ProjectCore",
 	"LittleECS",
 	"Blackbird"
 }
 
 project "BlackbirdStealth"
-	kind "ConsoleApp"
+	kind 		(Solution.Projects["BlackbirdStealth"].Type)
 	language "C++"
 	cppdialect "C++20"
 
